@@ -54,7 +54,7 @@ def add_review(request, pk):
         )
         messages.success(request, "შეფასება შენახულია.")
     else:
-        messages.error(request, "შეფასების ფორმა სწორად შეავსე.")
+        messages.error(request, "შეფასების ფორმა სწორად შეავსეთ.")
     return redirect("product_detail", pk=pk)
 
 def register(request):

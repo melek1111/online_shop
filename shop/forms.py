@@ -19,5 +19,5 @@ class ReviewForm(forms.ModelForm):
         labels = {"rating": "შეფასება (1–5)", "comment": "ტექსტური შეფასება"}
         widgets = {
             "rating": forms.Select(choices=[(i, f"{i} ★") for i in range(1, 6)]),
-            "comment": forms.Textarea(attrs={"rows": 3, "placeholder": "დაწერე შენი შეფასება..."}),
+            "comment": forms.Textarea(attrs={"rows": 3, "placeholder": "დაწერეთ თქვენი შეფასება..."}),
         }

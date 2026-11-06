@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}ჩემი კალათა | Aurora{% endblock %}
+{% block content %}
+<h1 class="mb-4">ჩემი კალათა</h1>
+<div class="row g-4">
+  <div class="col-lg-8">
+    {% for item in items %}
+    <div class="cart-item">
+      <div class="cart-thumb">{% if item.product.image_url %}<img src="{{ item.product.image_url }}" alt="{{ item.product.name }}">{% else %}<span>A</span>{% endif %}</div>
+      <div class="flex-grow-1"><a class="product-title" href="{% url 'product_detail' item.product.pk %}">{{ item.product.name }}</a><div class="small text-muted">{{ item.product.brand.name }} · მარაგი: {{ item.product.stock }}</div><div class="rating small">★ {{ item.product.average_rating|floatformat:1 }} · {{ item.product.review_count }} Reviews</div><strong>₾{{ item.subtotal }}</strong></div>
+      <div class="quantity-controls">
+        <form method="post" action="{% url 'update_cart_item' item.pk %}">{% csrf_token %}<input type="hidden" name="action" value="decrease"><button class="btn btn-outline-secondary btn-sm">−</button></form>
+        <span>{{ item.quantity }}</span>
+        <form method="post" action="{% url 'update_cart_item' item.pk %}">{% csrf_token %}<input type="hidden" name="action" value="increase"><button class="btn btn-outline-secondary btn-sm" {% if item.quantity >= item.product.stock %}disabled{% endif %}>+</button></form>
+      </div>
+      <form method="post" action="{% url 'remove_cart_item' item.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">წაშლა</button></form>
+    </div>
+    {% empty %}<div class="empty-state">კალათა ცარიელია. <a href="{% url 'home' %}">დაათვალიერე პროდუქტები</a>.</div>{% endfor %}
+  </div>
+  <aside class="col-lg-4"><div class="summary-panel"><h5>შეკვეთის შეჯამება</h5><div class="d-flex justify-content-between my-3"><span>პროდუქტების რაოდენობა</span><strong>{{ cart.total_quantity }}</strong></div><hr><div class="d-flex justify-content-between"><span>ჯამური ფასი</span><strong class="price fs-4">₾{{ cart.total_price|floatformat:2 }}</strong></div><p class="text-muted small mt-3">ეს სასწავლო პროექტია — რეალური გადახდის სისტემა არ არის ჩართული.</p><a href="{% url 'home' %}" class="btn btn-dark w-100">შოპინგის გაგრძელება</a></div></aside>
+</div>
+{% endblock %}

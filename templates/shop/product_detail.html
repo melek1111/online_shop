@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} | Aurora{% endblock %}
+{% block content %}
+<a href="{% url 'home' %}" class="text-decoration-none text-muted">← მაღაზიაში დაბრუნება</a>
+<div class="row g-5 mt-1">
+  <div class="col-md-6"><div class="detail-image">{% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.name }}">{% else %}<div class="placeholder-image">AURORA</div>{% endif %}</div></div>
+  <div class="col-md-6">
+    <p class="eyebrow">{{ product.brand.name }} · {{ product.category.name }}</p><h1 class="detail-title">{{ product.name }}</h1>
+    <div class="rating mb-3">★ {{ product.average_rating|floatformat:1 }} <span class="text-muted">({{ product.review_count }} შეფასება)</span></div>
+    <h2 class="price mb-3">₾{{ product.price }}</h2><p class="text-muted">{{ product.description }}</p>
+    <div class="spec-list"><div><span>ბრენდი</span><strong>{{ product.brand.name }}</strong></div><div><span>გამოშვების თარიღი</span><strong>{{ product.release_date|default:"მითითებული არ არის" }}</strong></div><div><span>მარაგში</span><strong>{{ product.stock }} ცალი</strong></div></div>
+    <form method="post" action="{% url 'add_to_cart' product.pk %}" class="mt-4">{% csrf_token %}<button class="btn btn-dark btn-lg" {% if product.stock < 1 %}disabled{% endif %}>კალათაში დამატება</button></form>
+  </div>
+</div>
+<div class="mt-5">
+  <ul class="nav nav-tabs" role="tablist"><li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#details" type="button">Details</button></li><li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews" type="button">Reviews ({{ product.review_count }})</button></li></ul>
+  <div class="tab-content border border-top-0 p-4 rounded-bottom">
+    <div class="tab-pane fade show active" id="details"><h5>პროდუქტის შესახებ</h5><p class="text-muted mb-0">{{ product.description }}</p></div>
+    <div class="tab-pane fade" id="reviews">
+      {% if user.is_authenticated %}<form method="post" action="{% url 'add_review' product.pk %}" class="review-form mb-4">{% csrf_token %}<h5>დატოვე შეფასება</h5>{{ form.as_p }}<button class="btn btn-dark">შეფასების გაგზავნა</button></form>{% else %}<p><a href="{% url 'login' %}">შედი სისტემაში</a>, რათა დატოვო შეფასება.</p>{% endif %}
+      {% for review in reviews %}<div class="review-item"><div class="d-flex justify-content-between"><strong>{{ review.user.get_full_name|default:review.user.username }}</strong><span class="rating">{% for i in "12345" %}{% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}{% endfor %}</span></div><p class="mb-1">{{ review.comment }}</p><small class="text-muted">{{ review.created_at|date:"d.m.Y H:i" }}</small></div>{% empty %}<p class="text-muted">შეფასებები ჯერ არ არის.</p>{% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

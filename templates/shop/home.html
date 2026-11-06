@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}მაღაზია | Aurora{% endblock %}
+{% block content %}
+<section class="hero mb-4"><div><p class="eyebrow">შეარჩიე შენი შემდეგი ფავორიტი</p><h1>აღმოაჩინე <em>საუკეთესო</em> პროდუქტები.</h1><p class="mb-0">ყველაფერი, რაც გჭირდება — ერთ სივრცეში.</p></div></section>
+<div class="row g-4">
+  <aside class="col-lg-3">
+    <form class="filter-panel" method="get">
+      <h5 class="mb-3">ფილტრები</h5>
+      <label class="form-label">ძებნა</label><input class="form-control mb-3" name="q" value="{{ filters.q }}" placeholder="პროდუქტის სახელი...">
+      <label class="form-label">კატეგორია</label><select class="form-select mb-3" name="category"><option value="">ყველა</option>{% for c in categories %}<option value="{{ c.id }}" {% if filters.category == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select>
+      <label class="form-label">ბრენდი</label><select class="form-select mb-3" name="brand"><option value="">ყველა</option>{% for b in brands %}<option value="{{ b.id }}" {% if filters.brand == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>{% endfor %}</select>
+      <label class="form-label">ფასი</label><div class="row g-2 mb-3"><div class="col"><input class="form-control" type="number" min="0" step="0.01" name="min_price" value="{{ filters.min_price }}" placeholder="დან"></div><div class="col"><input class="form-control" type="number" min="0" step="0.01" name="max_price" value="{{ filters.max_price }}" placeholder="მდე"></div></div>
+      <label class="form-label">მინ. რეიტინგი</label><select class="form-select mb-3" name="rating"><option value="">ყველა</option>{% for n in "12345" %}<option value="{{ n }}" {% if filters.rating == n %}selected{% endif %}>{{ n }} ★ და მეტი</option>{% endfor %}</select>
+      <button class="btn btn-dark w-100">გაფილტვრა</button><a href="{% url 'home' %}" class="btn btn-link w-100 mt-1">გასუფთავება</a>
+    </form>
+  </aside>
+  <section class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-3"><h4 class="mb-0">პროდუქტები</h4><span class="text-muted small">{{ products|length }} შედეგი</span></div>
+    <div class="row g-3">
+      {% for product in products %}
+      <div class="col-sm-6 col-xl-4">
+        <article class="product-card h-100">
+          <a href="{% url 'product_detail' product.pk %}" class="product-image">
+            {% if product.image_url %}<img src="{{ product.image_url }}" alt="{{ product.name }}">{% else %}<div class="placeholder-image">AURORA</div>{% endif %}
+          </a>
+          <div class="p-3">
+            <div class="small text-muted">{{ product.brand.name }} · {{ product.category.name }}</div>
+            <a class="product-title" href="{% url 'product_detail' product.pk %}">{{ product.name }}</a>
+            <div class="d-flex justify-content-between align-items-center mt-2"><strong class="price">₾{{ product.price }}</strong><span class="rating">★ {{ product.average_rating|floatformat:1 }}</span></div>
+            <form method="post" action="{% url 'add_to_cart' product.pk %}" class="mt-3">{% csrf_token %}<button class="btn btn-dark w-100" {% if product.stock < 1 %}disabled{% endif %}>{% if product.stock %}კალათაში დამატება{% else %}არ არის მარაგში{% endif %}</button></form>
+          </div>
+        </article>
+      </div>
+      {% empty %}<div class="col-12"><div class="empty-state">პროდუქტი ვერ მოიძებნა. შეცვალე ფილტრები ან დაამატე პროდუქტები Admin პანელიდან.</div></div>{% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
